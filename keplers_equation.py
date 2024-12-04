@@ -17,48 +17,55 @@ def computing_Nu(e, E, M_last, pi):
     return res
 
 def find_E_half_div(start, end, precision, t, e, freq, pi):
+    cnt = 0
     E_now = None
     while end - start >= 2 * precision:
         E_now = (start + end) / 2
         f_now = E_now - e * sin(E_now) - 2 * pi * freq * t
         if f_now == 0:
-            return E_now
+            return cnt, E_now
         elif f_now > 0:
             end = E_now
         else:
             start = E_now
+        cnt += 1
     
     if E_now is not None:
-        return E_now
+        return cnt, E_now
     return 'Возникла ошибка при вычислении корня'
 
-def find_E_golden_ration(start, end, precision, t, e, freq, pi):
+def find_E_golden_ratio(start, end, precision, t, e, freq, pi):
+    cnt = 0
     E_now = None
     golden_ratio = (5 ** 0.5 + 1) / 2
     while end - start >= 2 * precision:
         E_now = start + (end - start) / golden_ratio
         f_now = E_now - e * sin(E_now) - 2 * pi * freq * t
         if f_now == 0:
-            return E_now
+            return cnt, E_now
         elif f_now > 0:
             end = E_now
         else:
             start = E_now
+        cnt += 1
     
     if E_now is not None:
-        return E_now
+        return cnt, E_now
     return 'Возникла ошибка при вычислении корня'
 
 def find_E_success_approx(M, e, precision):
+    cnt = 0
     E_old = 0
     E_new = M
     while abs(E_new - E_old) >= precision:
         E_old = E_new
         E_new = e * sin(E_old) + M
+        cnt += 1
 
-    return E_new
+    return cnt, E_new
 
 def find_E_newton(M, e, precision):
+    cnt = 0
     E_old = 0
     E_new = M
     while abs(E_new - E_old) >= precision:
@@ -66,5 +73,6 @@ def find_E_newton(M, e, precision):
         f_old = E_old - e * sin(E_old) - M
         f_derivative_old = 1 - e * cos(E_old)
         E_new = E_old - (f_old / f_derivative_old)
+        cnt += 1
     
-    return E_new
+    return cnt, E_new

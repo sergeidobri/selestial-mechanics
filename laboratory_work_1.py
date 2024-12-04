@@ -5,11 +5,10 @@ import time
 
 def main():
     count_time_iterations = 1e5  # количество итераций
-    e, period, mu = load_info("selestial_mechanics/venus_orbit_elements.env")
+    e, period, mu = load_info("venus_orbit_elements.env")
     period *= 3600
-    precision = 1e-10
+    precision = 1e-15
 
-    # frequency /= 24*60*60  # перевод частоты об/сут. -> об/сек.
     frequency = 1 / period  # частота обращения
     
     # высчитываем отдельно M и t
@@ -23,7 +22,8 @@ def main():
         M_arr.append(2 * pi * frequency * time_start)
         time_start += time_step
 
-    fig, axs = plt.subplots(2, 2, figsize=(12, 10)) 
+    fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+    plt.subplots_adjust(hspace=0.2) 
 
     # 1. Метод половинного деления
     print("Начало метода половинного деления.")
@@ -32,14 +32,20 @@ def main():
 
     Nu_arr = []
     E_arr = []
+    cnt_arr = []
+
     for index, t in enumerate(t_arr):
-        E_arr.append(find_E_half_div(-1e3, 1e3, precision, t, e, frequency, pi))
+        cnt, E = find_E_half_div(-1e3, 1e3, precision, t, e, frequency, pi)
+        E_arr.append(E)
         Nu_arr.append(computing_Nu(e, E_arr[-1], M_arr[index], pi))
+        cnt_arr.append(cnt)
 
     end_time = time.time()
     execution_time = end_time - start_time
  
     print(f"Время вычисления методом половинного деления: {execution_time} секунд")
+
+    print(f"Cреднее количество итераций: {sum(cnt_arr) / len(cnt_arr)}, максимальное: {max(cnt_arr)}")
 
     fig1 = axs[0, 0]
 
@@ -61,15 +67,20 @@ def main():
 
     E_arr = []
     Nu_arr = []
+    cnt_arr = []
 
     for index, t in enumerate(t_arr):
-        E_arr.append(find_E_golden_ration(-1e3, 1e3, precision, t, e, frequency, pi))
+        cnt, E = find_E_golden_ratio(-1e3, 1e3, precision, t, e, frequency, pi)
+        E_arr.append(E)
         Nu_arr.append(computing_Nu(e, E_arr[-1], M_arr[index], pi))
+        cnt_arr.append(cnt)
 
     end_time = time.time()
     execution_time = end_time - start_time
  
     print(f"Время вычисления методом золотого сечения: {execution_time} секунд")
+
+    print(f"Cреднее количество итераций: {sum(cnt_arr) / len(cnt_arr)}, максимальное: {max(cnt_arr)}")
 
     fig2 = axs[0, 1]
 
@@ -91,15 +102,20 @@ def main():
 
     E_arr = []
     Nu_arr = []
+    cnt_arr = []
 
     for index, t in enumerate(t_arr):
-        E_arr.append(find_E_success_approx(M_arr[index], e, precision))
+        cnt, E = find_E_success_approx(M_arr[index], e, precision)
+        E_arr.append(E)
         Nu_arr.append(computing_Nu(e, E_arr[-1], M_arr[index], pi))
+        cnt_arr.append(cnt)
 
     end_time = time.time()
     execution_time = end_time - start_time
  
     print(f"Время вычисления методом итераций (методом последовательных приближений): {execution_time} секунд")
+
+    print(f"Cреднее количество итераций: {sum(cnt_arr) / len(cnt_arr)}, максимальное: {max(cnt_arr)}")
 
     fig3 = axs[1, 0]
 
@@ -122,15 +138,20 @@ def main():
 
     E_arr = []
     Nu_arr = []
+    cnt_arr = []
 
     for index, t in enumerate(t_arr):
-        E_arr.append(find_E_newton(M_arr[index], e, precision))
+        cnt, E = find_E_newton(M_arr[index], e, precision)
+        E_arr.append(E)
         Nu_arr.append(computing_Nu(e, E_arr[-1], M_arr[index], pi))
+        cnt_arr.append(cnt)
 
     end_time = time.time()
     execution_time = end_time - start_time
  
     print(f"Время вычисления методом Ньютона: {execution_time} секунд")
+
+    print(f"Cреднее количество итераций: {sum(cnt_arr) / len(cnt_arr)}, максимальное: {max(cnt_arr)}")
 
     fig4 = axs[1, 1]
 
